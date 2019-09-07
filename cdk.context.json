@@ -1,0 +1,14 @@
+{
+  "availability-zones:account=780350716816:region=us-east-1": [
+    "us-east-1a",
+    "us-east-1b",
+    "us-east-1c",
+    "us-east-1d",
+    "us-east-1e",
+    "us-east-1f"
+  ],
+  "hosted-zone:account=780350716816:domainName=shahab96.com:region=us-east-1": {
+    "Id": "/hostedzone/Z2GCKEQH874TQR",
+    "Name": "shahab96.com."
+  }
+}
