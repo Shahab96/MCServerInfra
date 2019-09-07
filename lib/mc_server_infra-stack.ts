@@ -8,9 +8,7 @@ export class McServerInfraStack extends cdk.Stack {
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    const vpc = new ec2.Vpc(this, 'MinecraftVPC', {
-      maxAzs: 2,
-    });
+    const vpc = new ec2.Vpc(this, 'MinecraftVPC');
     const machineImage = new ec2.WindowsImage(ec2.WindowsVersion.WINDOWS_SERVER_2019_ENGLISH_CORE_BASE);
     const instanceType = ec2.InstanceType.of(ec2.InstanceClass.BURSTABLE3, ec2.InstanceSize.MICRO);
     const securityGroup = new ec2.SecurityGroup(this, 'MinecraftSecurityGroup', {
@@ -25,6 +23,10 @@ export class McServerInfraStack extends cdk.Stack {
       instanceType,
       machineImage,
       securityGroup,
+      vpcSubnets: {
+        subnetType: ec2.SubnetType.PUBLIC,
+      },
+      keyName: 'McServerInfraKeyPair',
     });
   }
 }
