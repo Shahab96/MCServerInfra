@@ -13,7 +13,7 @@ export class McServerInfraStack extends cdk.Stack {
       maxAzs: 1,
     });
     const machineImage = new ec2.AmazonLinuxImage();
-    const instanceType = ec2.InstanceType.of(ec2.InstanceClass.BURSTABLE3_AMD, ec2.InstanceSize.MICRO);
+    const instanceType = ec2.InstanceType.of(ec2.InstanceClass.BURSTABLE3_AMD, ec2.InstanceSize.MEDIUM);
     const securityGroup = new ec2.SecurityGroup(this, "MinecraftSecurityGroup", {
       vpc,
     });
