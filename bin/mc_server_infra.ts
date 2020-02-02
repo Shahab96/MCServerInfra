@@ -7,6 +7,6 @@ const app = new cdk.App();
 new McServerInfraStack(app, "MinecraftServerStack", {
   env: {
     account: "780350716816",
-    region: "us-east-1",
+    region: "us-west-2",
   },
 });
