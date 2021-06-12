@@ -13,7 +13,7 @@ export class McServerInfraStack extends cdk.Stack {
       maxAzs: 1,      
     });
     const machineImage = new ec2.AmazonLinuxImage();
-    const instanceType = ec2.InstanceType.of(ec2.InstanceClass.BURSTABLE3_AMD, ec2.InstanceSize.MEDIUM);
+    const instanceType = ec2.InstanceType.of(ec2.InstanceClass.M5, ec2.InstanceSize.XLARGE);
     const securityGroup = new ec2.SecurityGroup(this, "SecurityGroup", {
       vpc,
     });
@@ -29,7 +29,7 @@ export class McServerInfraStack extends cdk.Stack {
       vpcSubnets: {
         subnetType: ec2.SubnetType.PUBLIC,
       },
-      keyName: "MinecraftKeyPair",
+      keyName: "ATM6",
     });
 
     const zone = route53.PublicHostedZone.fromHostedZoneAttributes(this, "HostedZone", {
@@ -37,7 +37,7 @@ export class McServerInfraStack extends cdk.Stack {
       zoneName: "shahab96.com",
     });
     const hostedZone = new route53.PublicHostedZone(this, "MinecraftHostedZone", {
-      zoneName: `minecraft.${zone.zoneName}`,
+      zoneName: `atm6.${zone.zoneName}`,
     });
     new route53.RecordSet(this, "DelegationRecord", {
       recordType: route53.RecordType.NS,
@@ -47,7 +47,7 @@ export class McServerInfraStack extends cdk.Stack {
     });
     const target = route53.RecordTarget.fromIpAddresses(this.serverInstance.instancePublicIp);
     new route53.ARecord(this, "MinecraftServerDNSRecord", {
-      recordName: "minecraft.shahab96.com",
+      recordName: "atm6.shahab96.com",
       zone: hostedZone,
       target,
     });
