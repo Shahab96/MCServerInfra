@@ -21,6 +21,7 @@ export class McServerInfraStack extends cdk.Stack {
 
     securityGroup.addIngressRule(ec2.Peer.anyIpv4(), ec2.Port.tcp(22));
     securityGroup.addIngressRule(ec2.Peer.anyIpv4(), ec2.Port.tcp(25565));
+    securityGroup.addIngressRule(ec2.Peer.anyIpv4(), ec2.Port.tcp(8123));
 
     this.serverInstance = new ec2.Instance(this, "MinecraftServer", {
       vpc,
