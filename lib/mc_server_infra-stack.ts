@@ -1,6 +1,7 @@
 import * as cdk from "@aws-cdk/core";
 import * as ec2 from "@aws-cdk/aws-ec2";
 import * as route53 from "@aws-cdk/aws-route53";
+import * as s3 from "@aws-cdk/aws-s3";
 
 export class McServerInfraStack extends cdk.Stack {
   public serverInstance: ec2.Instance;
@@ -50,6 +51,10 @@ export class McServerInfraStack extends cdk.Stack {
       recordName: "atm6.shahab96.com",
       zone: hostedZone,
       target,
+    });
+
+    new s3.Bucket(this, "WorldBucket", {
+      blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
     });
   }
 }
