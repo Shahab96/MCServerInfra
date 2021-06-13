@@ -53,8 +53,10 @@ export class McServerInfraStack extends cdk.Stack {
       target,
     });
 
-    new s3.Bucket(this, "WorldBucket", {
+    const bucket = new s3.Bucket(this, "WorldBucket", {
       blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
     });
+
+    bucket.grantReadWrite(this.serverInstance);
   }
 }
