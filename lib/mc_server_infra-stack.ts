@@ -1,17 +1,22 @@
 import * as cdk from "@aws-cdk/core";
 import * as ec2 from "@aws-cdk/aws-ec2";
 import * as route53 from "@aws-cdk/aws-route53";
-import * as s3 from "@aws-cdk/aws-s3";
+
+interface McServerInfraStackProps extends cdk.StackProps {
+  keyName: string;
+  dynmapPortForward: boolean;
+  subDomain: string;
+}
 
 export class McServerInfraStack extends cdk.Stack {
   public serverInstance: ec2.Instance;
   public elasticIP: ec2.CfnEIP;
 
-  constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
+  constructor(scope: cdk.Construct, id: string, props: McServerInfraStackProps) {
     super(scope, id, props);
 
     const vpc = new ec2.Vpc(this, "VPC", {
-      maxAzs: 1,      
+      maxAzs: 1,
     });
     const machineImage = new ec2.AmazonLinuxImage();
     const instanceType = ec2.InstanceType.of(ec2.InstanceClass.M5, ec2.InstanceSize.XLARGE);
@@ -21,7 +26,10 @@ export class McServerInfraStack extends cdk.Stack {
 
     securityGroup.addIngressRule(ec2.Peer.anyIpv4(), ec2.Port.tcp(22));
     securityGroup.addIngressRule(ec2.Peer.anyIpv4(), ec2.Port.tcp(25565));
-    securityGroup.addIngressRule(ec2.Peer.anyIpv4(), ec2.Port.tcp(8123));
+
+    if (props.dynmapPortForward) {
+      securityGroup.addIngressRule(ec2.Peer.anyIpv4(), ec2.Port.tcp(8123));
+    }
 
     this.serverInstance = new ec2.Instance(this, "MinecraftServer", {
       vpc,
@@ -31,7 +39,7 @@ export class McServerInfraStack extends cdk.Stack {
       vpcSubnets: {
         subnetType: ec2.SubnetType.PUBLIC,
       },
-      keyName: "ATM6",
+      keyName: props.keyName,
     });
 
     const zone = route53.PublicHostedZone.fromHostedZoneAttributes(this, "HostedZone", {
@@ -39,7 +47,7 @@ export class McServerInfraStack extends cdk.Stack {
       zoneName: "shahab96.com",
     });
     const hostedZone = new route53.PublicHostedZone(this, "MinecraftHostedZone", {
-      zoneName: `atm6.${zone.zoneName}`,
+      zoneName: `${props.subDomain}.${zone.zoneName}`,
     });
     new route53.RecordSet(this, "DelegationRecord", {
       recordType: route53.RecordType.NS,
@@ -49,15 +57,9 @@ export class McServerInfraStack extends cdk.Stack {
     });
     const target = route53.RecordTarget.fromIpAddresses(this.serverInstance.instancePublicIp);
     new route53.ARecord(this, "MinecraftServerDNSRecord", {
-      recordName: "atm6.shahab96.com",
+      recordName: hostedZone.zoneName,
       zone: hostedZone,
       target,
     });
-
-    const bucket = new s3.Bucket(this, "WorldBucket", {
-      blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
-    });
-
-    bucket.grantReadWrite(this.serverInstance);
   }
 }
