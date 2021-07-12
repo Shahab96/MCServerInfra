@@ -6,6 +6,8 @@ interface McServerInfraStackProps extends cdk.StackProps {
   keyName: string;
   dynmapPortForward: boolean;
   subDomain: string;
+  instanceClass: ec2.InstanceClass;
+  instanceSize: ec2.InstanceSize;
 }
 
 export class McServerInfraStack extends cdk.Stack {
@@ -19,7 +21,7 @@ export class McServerInfraStack extends cdk.Stack {
       maxAzs: 1,
     });
     const machineImage = new ec2.AmazonLinuxImage();
-    const instanceType = ec2.InstanceType.of(ec2.InstanceClass.M5, ec2.InstanceSize.LARGE);
+    const instanceType = ec2.InstanceType.of(props.instanceClass, props.instanceSize);
     const securityGroup = new ec2.SecurityGroup(this, "SecurityGroup", {
       vpc,
     });
