@@ -1,6 +1,7 @@
 import * as cdk from "@aws-cdk/core";
 import * as ec2 from "@aws-cdk/aws-ec2";
 import * as route53 from "@aws-cdk/aws-route53";
+import * as iam from "@aws-cdk/aws-iam";
 
 interface McServerInfraStackProps extends cdk.StackProps {
   keyName: string;
@@ -43,6 +44,28 @@ export class McServerInfraStack extends cdk.Stack {
       },
       keyName: props.keyName,
     });
+
+    this.serverInstance.addToRolePolicy(new iam.PolicyStatement({
+      actions: [
+        "ssmmessages:CreateControlChannel",
+        "ssmmessages:CreateDataChannel",
+        "ssmmessages:OpenControlChannel",
+        "ssmmessages:OpenDataChannel",
+        "s3:GetEncryptionConfiguration"
+      ],
+      resources: ["*"],
+    }));
+
+    this.serverInstance.addToRolePolicy(new iam.PolicyStatement({
+      actions: [
+        "kms:Decrypt",
+      ],
+      resources: [cdk.Arn.format({
+        service: "kms",
+        resource: "key",
+        resourceName: props.keyName,
+      }, this)],
+    }));
 
     const zone = route53.PublicHostedZone.fromHostedZoneAttributes(this, "HostedZone", {
       hostedZoneId: "Z2GCKEQH874TQR",
